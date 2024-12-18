@@ -12,7 +12,7 @@ replace nat_guid = subinstr(nat_guid,"{", "",.)
 drop if(missing(id_table))
 drop id_table
 
-keep taxyear declarationtype financialyeartype senddate_per fromdate_per todate_per acceptancestatus gto edarename activitytypename activitytype nat_guid nationality postalcode
+keep taxyear declarationtype financialyeartype senddate_per fromdate_per todate_per acceptancestatus gto edarename activitytypename activitytype nat_guid nationality postalcode trace_id
 
 rename nat_guid id
 rename taxyear actyear
@@ -37,7 +37,7 @@ save "D:\Data_Output\Cleaning_Code\Temp\temp1.dta", replace
 
 import delimited "D:\CSV_Output\Part1\Hoghooghi_91.csv", delimiter("؛") encoding(UTF-8) clear 
 
-keep nat_guid actyear activitytypename activitytype exportdate isactive fromdate todate edarekolcode edarename nationalitytype workplace* staffnumber qusedworkplaceownedflag qusedworkplacerentedflag qisinbourse
+keep nat_guid actyear activitytypename activitytype exportdate isactive fromdate todate edarekolcode edarename nationalitytype workplace* staffnumber qusedworkplaceownedflag qusedworkplacerentedflag qisinbourse trace_id
 
 drop if(missing(actyear))
 replace nat_guid = subinstr(nat_guid,"}", "",.)
@@ -92,7 +92,7 @@ save "D:\Data_Output\Cleaning_Code\Temp\temp2.dta", replace
 
 import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98_non_financial.csv", delimiter("؛") clear  
 
-drop trace_id
+// drop trace_id
 
 foreach i of varlist activitytypename activitytype edarename isactive staffnumber qincreaseincome lastyearincome currentyearincome increasepercent workplacepostcode1 {
     replace `i' = "" if(`i'=="NULL")
