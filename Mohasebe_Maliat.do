@@ -51,7 +51,7 @@ replace nat_guid = subinstr(nat_guid,"}", "",.)
 replace nat_guid = subinstr(nat_guid,"{", "",.)
 rename nat_guid id
 
-keep id actyear soodzianvije tadilatsoodziansanavati plusorminus_soodzianvije moafincomes mazadkomakhayepardakhti tadilatsum ziangheirmoaf daramadmashmoolmaliat estehlakziananbashte khesaratm165 daramadmashmoolnakhales sahmotaghbazargani daramadmashmoolmaliatkhales maliatmotalegh bakhshoodegi maliatghabelpardakht pardakhtanjamshode maliatmoghararpardakhtani
+keep id actyear soodzianvije tadilatsoodziansanavati plusorminus_soodzianvije moafincomes mazadkomakhayepardakhti tadilatsum ziangheirmoaf daramadmashmoolmaliat estehlakziananbashte khesaratm165 daramadmashmoolnakhales sahmotaghbazargani daramadmashmoolmaliatkhales maliatmotalegh bakhshoodegi maliatghabelpardakht pardakhtanjamshode maliatmoghararpardakhtani trace_id
 
 destring soodzianvije tadilatsoodziansanavati plusorminus_soodzianvije moafincomes mazadkomakhayepardakhti tadilatsum ziangheirmoaf daramadmashmoolmaliat estehlakziananbashte khesaratm165 daramadmashmoolnakhales sahmotaghbazargani daramadmashmoolmaliatkhales maliatmotalegh bakhshoodegi maliatghabelpardakht pardakhtanjamshode maliatmoghararpardakhtani, replace ignore("NULL")
 
@@ -80,7 +80,8 @@ save "D:\Data_Output\Cleaning_Code\Temp\temp2.dta", replace
 
 
 
-import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98_financial.csv", clear 
+// import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98_financial.csv", clear 
+import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98.csv", clear 
 
 
 drop if(missing(actyear))
@@ -88,7 +89,7 @@ replace nat_guid = subinstr(nat_guid,"}", "",.)
 replace nat_guid = subinstr(nat_guid,"{", "",.)
 rename nat_guid id
 
-keep id actyear soodzianvije tadilatsoodziansanavati plusorminus_soodzianvije moafincomes incidentalincome mazadkomakhayepardakhti tadilatsum ziangheirmoaf estehlakziananbashte khesaratm165 daramadmashmoolnakhales sahmotaghbazargani daramadmashmoolmaliatkhales maliatmotalegh bakhshoodegi maliatmoghararpardakhtani incidentaltaxableincome incidentaltax pardakhtanjamshode maliatghabelpardakht discountintaxm105 incomeeffectivem105 maliatmaghtoo differenceofincome
+keep id actyear soodzianvije tadilatsoodziansanavati plusorminus_soodzianvije moafincomes incidentalincome mazadkomakhayepardakhti tadilatsum ziangheirmoaf estehlakziananbashte khesaratm165 daramadmashmoolnakhales sahmotaghbazargani daramadmashmoolmaliatkhales maliatmotalegh bakhshoodegi maliatmoghararpardakhtani incidentaltaxableincome incidentaltax pardakhtanjamshode maliatghabelpardakht discountintaxm105 incomeeffectivem105 maliatmaghtoo differenceofincome trace_id
 
 rename soodzianvije T26_R01
 rename tadilatsoodziansanavati T26_R02
@@ -119,6 +120,7 @@ append using "D:\Data_Output\Cleaning_Code\Temp\temp2.dta"
 append using "D:\Data_Output\Cleaning_Code\Temp\temp1.dta"
 
 
+
 preserve
 keep id
 duplicates drop
@@ -133,5 +135,17 @@ rename new_id id
 
 sort actyear id
 order id actyear
+
+save "D:\Data_Output\Hoghooghi\Mohasebe_Maliat.dta", replace
+
+
+
+// #### Add Tashkhisi/Ghati date
+import delimited "D:\CSV_Output\part3\tashkhisi_ghati_corporate.csv", clear
+
+rename id trace_id
+drop actyear
+
+merge 1:1 trace_id using "D:\Data_Output\Hoghooghi\Mohasebe_Maliat.dta", nogen
 
 save "D:\Data_Output\Hoghooghi\Mohasebe_Maliat.dta", replace

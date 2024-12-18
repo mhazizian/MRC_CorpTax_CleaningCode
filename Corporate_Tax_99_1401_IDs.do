@@ -3,7 +3,7 @@
 
 import delimited "D:\CSV_Output\Part1\Hoghooghi_99_1401.csv", clear 
 
-keep id_table nat_guid taxyear
+keep id_table nat_guid taxyear trace_id
 
 replace id_table = subinstr(id_table,"}", "",.)
 replace id_table = subinstr(id_table,"{", "",.)
