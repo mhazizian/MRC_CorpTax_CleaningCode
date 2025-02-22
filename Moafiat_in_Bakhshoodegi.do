@@ -55,7 +55,7 @@ rename rebatecaserate Rebate_Rate
 rename rebateamount Rebate_Amount
 
 sort actyear id
-order id actyear exemption_description exemption_id Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount
+order id actyear trace_id exemption_description exemption_id Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount
 
 save "D:\Data_Output\Cleaning_Code\Temp\temp1.dta", replace
 
@@ -63,24 +63,30 @@ save "D:\Data_Output\Cleaning_Code\Temp\temp1.dta", replace
 ******************************
 import delimited "D:\CSV_Output\Part1\Hoghooghi_91.csv", delimiter("؛") encoding(UTF-8) clear 
 
-drop if(missing(actyear))
 replace nat_guid = subinstr(nat_guid,"}", "",.)
 replace nat_guid = subinstr(nat_guid,"{", "",.)
 rename nat_guid id
 
-duplicates drop id actyear, force ////// Concern
+//duplicates drop id actyear, force ////// Concern
 
-keep id actyear bakhshoodegi* 
+keep id actyear bakhshoodegi* trace_id
 drop bakhshoodegi *sum
 
-destring bakhshoodegi*, replace ignore("NULL")
+foreach i of varlist bakhshoodegi* {
+    capture confirm string variable `i'
+	if(_rc==0){
+	    replace `i' = substr(`i',1,strpos(`i',"/")-1)
+	}
+}
+
+destring bakhshoodegi* trace_id, replace ignore("NULL")
 
 rename bakhshoodegibenefit* Taxable_Profit*
 rename bakhshoodegitax* Taxable_Profit_Tax*
 rename bakhshoodegirate* Rebate_Rate*
 rename bakhshoodegiqty* Rebate_Amount*
 
-reshape long Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount, i(id actyear) j(code)
+reshape long Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount, i(trace_id id actyear) j(code)
 
 drop if((Taxable_Profit==0 | missing(Taxable_Profit)) & (Taxable_Profit_Tax==0 | missing(Taxable_Profit_Tax)) & (Rebate_Amount==0 | missing(Rebate_Amount)))
 
@@ -106,26 +112,32 @@ drop if(missing(exemption_id))
 drop code bakhshoodegi_id
 
 sort actyear id
-order id actyear exemption_description exemption_id Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount
+order id actyear trace_id exemption_description exemption_id Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount
 
 save "D:\Data_Output\Cleaning_Code\Temp\temp2.dta", replace
 
 
 
 ******************************
-import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98_financial.csv", clear
+import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98.csv", clear
 
-drop if(missing(actyear))
 replace nat_guid = subinstr(nat_guid,"}", "",.)
 replace nat_guid = subinstr(nat_guid,"{", "",.)
 rename nat_guid id
 
-duplicates drop id actyear, force ////// Concern
+//duplicates drop id actyear, force ////// Concern
 
-keep id actyear bakhshoodegi* 
+keep id actyear bakhshoodegi* trace_id
 drop bakhshoodegi *sum
 
-destring bakhshoodegi*, replace ignore("NULL/")
+foreach i of varlist bakhshoodegi* {
+    capture confirm string variable `i'
+	if(_rc==0){
+	    replace `i' = substr(`i',1,strpos(`i',"/")-1)
+	}
+}
+
+destring bakhshoodegi* trace_id, replace ignore("NULL")
 
 gen bakhshoodegi = 0
 foreach i of varlist bakhshoodegi* {
@@ -140,7 +152,7 @@ rename bakhshoodegitax* Taxable_Profit_Tax*
 rename bakhshoodegirate* Rebate_Rate*
 rename bakhshoodegiqty* Rebate_Amount*
 
-reshape long Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount, i(id actyear) j(code)
+reshape long Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount, i(trace_id id actyear) j(code)
 
 drop if((Taxable_Profit==0 | missing(Taxable_Profit)) & (Taxable_Profit_Tax==0 | missing(Taxable_Profit_Tax)) & (Rebate_Amount==0 | missing(Rebate_Amount)))
 
@@ -172,11 +184,11 @@ drop if(missing(exemption_id))
 drop code bakhshoodegi_id
 
 sort actyear id
-order id actyear exemption_description exemption_id Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount
+order id actyear trace_id exemption_description exemption_id Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount
 
 append using "D:\Data_Output\Cleaning_Code\Temp\temp2.dta"
 append using "D:\Data_Output\Cleaning_Code\Temp\temp1.dta"
-append using "D:\Data_Output\Cleaning_Code\Temp\temp_bakh_in_moaf.dta"
+//append using "D:\Data_Output\Cleaning_Code\Temp\temp_bakh_in_moaf.dta"
 
 
 merge n:1 id using "D:\Data_Output\Cleaning_Code\Temp\temp_id_new.dta", nogen
@@ -186,16 +198,20 @@ rename new_id id
 drop if((Taxable_Profit==0 | missing(Taxable_Profit)) & (Taxable_Profit_Tax==0 | missing(Taxable_Profit_Tax)) & (Rebate_Amount==0 | missing(Rebate_Amount)))
 
 sort actyear id
-order id actyear
-
+order id actyear trace_id
+/*
 encode bakhshoodegi_description, gen(temp)
 drop bakhshoodegi_description
 rename temp bakhshoodegi_description
-
+*/
 rename Rebate_Amount Exempted_Profit
+replace Exempted_Profit = Exempted_Profit * 4
+
 drop Taxable_Profit Taxable_Profit_Tax Rebate_Rate
 
 sort actyear id
-order id actyear exemption_description exemption_id Exempted_Profit
+order id actyear trace_id exemption_description exemption_id Exempted_Profit
+
+gen exempt_flag = 1
 
 save "D:\Data_Output\Cleaning_Code\Temp\temp_moaf_in_bakh.dta", replace

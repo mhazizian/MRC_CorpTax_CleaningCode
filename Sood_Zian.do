@@ -77,10 +77,7 @@ forvalues i = 0(1)6 {
 
 merge n:1 return_id using "D:\Data_Output\Cleaning_Code\Temp\temp_id.dta", nogen
 
-drop if(missing(return_id))
 drop return_id
-
-drop if(missing(id))
 
 save "D:\Data_Output\Cleaning_Code\Temp\temp1.dta", replace
 
@@ -94,7 +91,7 @@ replace nat_guid = subinstr(nat_guid,"}", "",.)
 replace nat_guid = subinstr(nat_guid,"{", "",.)
 rename nat_guid id
 
-keep id actyear sz_*
+keep id actyear sz_* trace_id
 
 drop sz_todate sz_forooshkhalesp sz_kalaforooshraftep sz_nakhalesforooshp sz_tamamshodepeymanp sz_na_khalespeymanp sz_na_khalesp sz_hoghughp sz_hazinetablighatp sz_motalebatmashkokp sz_hazinehesabresip sz_hazinemoshaverp sz_hazineejaremahalp sz_sayerhazineforooshp sz_sumhazineforooshp sz_frooshzayeatp sz_taseirdaraeep sz_sayerdaramadamaliatip sz_khalessayerdamaliatip sz_amaliatip sz_gheirmangholp sz_forooshsayerdaraeep sz_frooshmavadp sz_frooshsarmayep sz_taseirdaraeenp sz_soodsahamp sz_mosharekatp sz_ejarep sz_helpp sz_sayerdaramadnamaliatip sz_khalessayerdnamaliatip sz_hazinemalip sz_vijep sz_daramadnpeimankarip
 
@@ -147,7 +144,7 @@ save "D:\Data_Output\Cleaning_Code\Temp\temp2.dta", replace
 
 
 
-import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98_financial.csv", clear 
+import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98.csv", clear 
 
 
 drop if(missing(actyear))
@@ -155,7 +152,7 @@ replace nat_guid = subinstr(nat_guid,"}", "",.)
 replace nat_guid = subinstr(nat_guid,"{", "",.)
 rename nat_guid id
 
-keep id actyear sz_*
+keep id actyear sz_* trace_id
 
 drop sz_todate sz_forooshkhalesp sz_kalaforooshraftep sz_nakhalesforooshp sz_daramadnpeimankarip sz_tamamshodepeymanp sz_na_khalespeymanp sz_na_khalesp sz_hoghughp sz_hazinetablighatp sz_motalebatmashkokp sz_hazinehesabresip sz_hazinemoshaverp sz_hazineejaremahalp sz_sayerhazineforooshp sz_sumhazineforooshp sz_frooshzayeatp sz_taseirdaraeep sz_sayerhazineamaliatip sz_sayerdaramadamaliatip sz_khalessayerdamaliatip sz_amaliatip sz_gheirmangholp sz_forooshsayerdaraeep sz_frooshmavadp sz_frooshsarmayep sz_taseirdaraeenp sz_soodsahamp sz_mosharekatp sz_sarmayegozarip sz_ejarep sz_helpp sz_sayerdaramadnamaliatip sz_khalessayerdnamaliatip sz_hazinemalip sz_vijep sz_incidentalincomep
 
@@ -223,6 +220,6 @@ drop id
 rename new_id id
 
 sort actyear id
-order id actyear
+order id actyear trace_id
 
 save "D:\Data_Output\Hoghooghi\Sood_Zian.dta", replace

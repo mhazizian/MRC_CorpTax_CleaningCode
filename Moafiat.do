@@ -47,15 +47,15 @@ drop if(missing(id))
 
 merge n:1 exemption_id using "D:\Data_Output\Cleaning_Code\Temp\exemption_codes.dta", nogen
 
-drop exemptactivitiesdescription
+rename exemptactivitiesdescription original_description
        
 rename totalincome Exempted_Revenue
 rename directcostexemptincome Exempted_Cost
 rename sharejointexpences Exempted_joint_Cost
 rename profitlossexemptincome Exempted_Profit
 
-sort actyear id
-order id actyear exemption_description exemption_id Exempted_Profit Exempted_Revenue Exempted_Cost Exempted_joint_Cost
+sort actyear id 
+order id actyear trace_id exemption_description exemption_id Exempted_Profit Exempted_Revenue Exempted_Cost Exempted_joint_Cost
 
 save "D:\Data_Output\Cleaning_Code\Temp\temp1.dta", replace
 
@@ -69,19 +69,19 @@ replace nat_guid = subinstr(nat_guid,"}", "",.)
 replace nat_guid = subinstr(nat_guid,"{", "",.)
 rename nat_guid id
 
-duplicates drop id actyear, force ////// Concern
+///duplicates drop id actyear, force ////// Concern
 
-keep id actyear moaf*
+keep id actyear moaf* trace_id
 drop moafincomes
 
-destring moaf*, replace ignore("NULL")
+destring moaf* trace_id, replace ignore("NULL")
 
 rename moaf*income Exempted_Revenue*
 rename moaf*hazinemostaghim Exempted_Cost*
 rename moaf*hazinemoshtarak Exempted_joint_Cost*
 rename moaf*benefit Exempted_Profit*
 
-reshape long Exempted_Revenue Exempted_Cost Exempted_joint_Cost Exempted_Profit, i(id actyear) j(desc) string
+reshape long Exempted_Revenue Exempted_Cost Exempted_joint_Cost Exempted_Profit, i(trace_id id actyear) j(desc) string
 
 drop if((Exempted_Revenue==0 | missing(Exempted_Revenue)) & (Exempted_Cost==0 | missing(Exempted_Cost)) & (Exempted_joint_Cost==0 | missing(Exempted_joint_Cost)) & (Exempted_Profit==0 | missing(Exempted_Profit)))
 
@@ -116,14 +116,14 @@ drop if(missing(exemption_description))
 drop desc
 
 sort actyear id
-order id actyear exemption_description exemption_id Exempted_Profit Exempted_Revenue Exempted_Cost Exempted_joint_Cost
+order id actyear trace_id exemption_description exemption_id Exempted_Profit Exempted_Revenue Exempted_Cost Exempted_joint_Cost
 
 save "D:\Data_Output\Cleaning_Code\Temp\temp2.dta", replace
 
 
 *************************************
-forvalues i=1392(1)1397{
-	import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98_financial.csv", clear 
+forvalues i=1392(1)1398{
+	import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98.csv", clear 
 	
 	keep if(actyear==`i')
 
@@ -132,22 +132,22 @@ forvalues i=1392(1)1397{
 	replace nat_guid = subinstr(nat_guid,"{", "",.)
 	rename nat_guid id
 	
-	duplicates drop id actyear, force ////// Concern
+	//duplicates drop id actyear, force ////// Concern
 
-	keep id actyear moaf* v219 v327 v348 v349 v353 v354
-	drop moafincomes moafsumincome moafsumhazinemostaghim moafsumhazinemoshtarak moafsumbenefit moafsayerplan5yearsdesc1 moafsayerplan5yearsincome1 moafsayerplan5yearshazinemostagh moafsayerplan5yearshazinemoshtar moafsayerplan5yearsbenefit1 moafsayerplan5yearsdesc2 moafsayerplan5yearsincome2 v348 v349 moafsayerplan5yearsbenefit2 moafsayerplan5yearsdesc3 moafsayerplan5yearsincome3 v353 v354 moafsayerplan5yearsbenefit3
+	keep id actyear moaf* v240 v348 v369 v370 v374 v375 trace_id
+	drop moafincomes moafsumincome moafsumhazinemostaghim moafsumhazinemoshtarak moafsumbenefit moafsayerplan5yearsdesc1 moafsayerplan5yearsincome1 moafsayerplan5yearshazinemostagh moafsayerplan5yearshazinemoshtar moafsayerplan5yearsbenefit1 moafsayerplan5yearsdesc2 moafsayerplan5yearsincome2 v369 v370 moafsayerplan5yearsbenefit2 moafsayerplan5yearsdesc3 moafsayerplan5yearsincome3 v374 v375 moafsayerplan5yearsbenefit3
 	
 	rename moaf*hazinemost* moaf*hmost
 	rename moaf*hazinemosht* moaf*hmosh
 	
 	rename moafm132increaseemployeeincome moafm132incempincome
 	rename moafm132increaseemployeehazinemo moafm132incemphmost
-	rename v219 moafm132incemphmosh
+	rename v240 moafm132incemphmosh
 	rename moafm132increaseemployeebenefit moafm132incempbenefit
 	
 	rename moafm141agriculturalexpincome moafm141agrincome
 	rename moafm141agriculturalexphazinemos moafm141agrhmost
-	rename v327 moafm141agrhmosh
+	rename v348 moafm141agrhmosh
 	rename moafm141agriculturalexpbenefit moafm141agrbenefit
 	
 	rename moafm141rawmaterialexphazinemosh moafm141rawmaterialexphmosh
@@ -158,7 +158,7 @@ forvalues i=1392(1)1397{
 	rename moaf*hmosh Exempted_jC*
 	rename moaf*benefit Exempted_P*
 
-	reshape long Exempted_R Exempted_C Exempted_jC Exempted_P, i(id actyear) j(desc) string
+	reshape long Exempted_R Exempted_C Exempted_jC Exempted_P, i(trace_id id actyear) j(desc) string
 
 	drop if((Exempted_R==0 | missing(Exempted_R)) & (Exempted_C==0 | missing(Exempted_C)) & (Exempted_jC==0 | missing(Exempted_jC)) & (Exempted_P==0 | missing(Exempted_P)))
 	
@@ -166,16 +166,16 @@ forvalues i=1392(1)1397{
 }
 
 
-import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98_financial.csv", clear 
+import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98.csv", clear 
 
 drop if(missing(actyear))
 replace nat_guid = subinstr(nat_guid,"}", "",.)
 replace nat_guid = subinstr(nat_guid,"{", "",.)
 rename nat_guid id
 	
-duplicates drop id actyear, force ////// Concern
+//duplicates drop id actyear, force ////// Concern
 
-keep id actyear moafsayerplan5yearsdesc1 moafsayerplan5yearsincome1 moafsayerplan5yearshazinemostagh moafsayerplan5yearshazinemoshtar moafsayerplan5yearsbenefit1 moafsayerplan5yearsdesc2 moafsayerplan5yearsincome2 v348 v349 moafsayerplan5yearsbenefit2 moafsayerplan5yearsdesc3 moafsayerplan5yearsincome3 v353 v354 moafsayerplan5yearsbenefit3
+keep id actyear trace_id moafsayerplan5yearsdesc1 moafsayerplan5yearsincome1 moafsayerplan5yearshazinemostagh moafsayerplan5yearshazinemoshtar moafsayerplan5yearsbenefit1 moafsayerplan5yearsdesc2 moafsayerplan5yearsincome2 v369 v370 moafsayerplan5yearsbenefit2 moafsayerplan5yearsdesc3 moafsayerplan5yearsincome3 v374 v375 moafsayerplan5yearsbenefit3
 
 rename moafsayerplan5yearsdesc1 moafsplan5yeardesc1
 rename moafsayerplan5yearsincome1 moafsplan5yearincome1
@@ -185,17 +185,17 @@ rename moafsayerplan5yearsbenefit1 moafsplan5yearbenefit1
 
 rename moafsayerplan5yearsdesc2 moafsplan5yeardesc2
 rename moafsayerplan5yearsincome2 moafsplan5yearincome2
-rename v348 moafsplan5yearmost2
-rename v349 moafsplan5yearmosht2
+rename v369 moafsplan5yearmost2
+rename v370 moafsplan5yearmosht2
 rename moafsayerplan5yearsbenefit2 moafsplan5yearbenefit2
 	
 rename moafsayerplan5yearsdesc3 moafsplan5yeardesc3
 rename moafsayerplan5yearsincome3 moafsplan5yearincome3
-rename v353 moafsplan5yearmost3
-rename v354 moafsplan5yearmosht3
+rename v374 moafsplan5yearmost3
+rename v375 moafsplan5yearmosht3
 rename moafsayerplan5yearsbenefit3 moafsplan5yearbenefit3
 
-reshape long moafsplan5yeardesc moafsplan5yearincome moafsplan5yearmost moafsplan5yearmosht moafsplan5yearbenefit, i(id actyear) j(code)
+reshape long moafsplan5yeardesc moafsplan5yearincome moafsplan5yearmost moafsplan5yearmosht moafsplan5yearbenefit, i(trace_id id actyear) j(code)
 
 rename moafsplan5yeardesc desc 
 rename moafsplan5yearincome Exempted_Revenue
@@ -205,7 +205,8 @@ rename moafsplan5yearbenefit Exempted_Profit
 
 drop if((Exempted_Revenue==0 | missing(Exempted_Revenue)) & (Exempted_Cost==0 | missing(Exempted_Cost)) & (Exempted_joint_Cost==0 | missing(Exempted_joint_Cost)) & (Exempted_Profit==0 | missing(Exempted_Profit)))
 
-drop code desc
+drop code
+rename desc original_description
 gen exemption_id = 118 //// Concern
 
 merge n:1 exemption_id using "D:\Data_Output\Cleaning_Code\Temp\exemption_codes.dta", nogen
@@ -218,7 +219,7 @@ save "D:\Data_Output\Cleaning_Code\Temp\temp3_tosee.dta", replace
 
 **********************************
 use "D:\Data_Output\Cleaning_Code\Temp\temp3_1392.dta", clear
-forvalues i=1393(1)1397{
+forvalues i=1393(1)1398{
 	append using "D:\Data_Output\Cleaning_Code\Temp\temp3_`i'.dta"
 }
 
@@ -272,7 +273,7 @@ rename Exempted_C Exempted_Cost
 rename Exempted_jC Exempted_joint_Cost
 
 sort actyear id
-order id actyear exemption_description exemption_id Exempted_Profit Exempted_Revenue Exempted_Cost Exempted_joint_Cost
+order id actyear trace_id exemption_description exemption_id Exempted_Profit Exempted_Revenue Exempted_Cost Exempted_joint_Cost
 
 
 append using "D:\Data_Output\Cleaning_Code\Temp\temp2.dta"
@@ -288,13 +289,19 @@ append using "D:\Data_Output\Cleaning_Code\Temp\temp_moaf_in_bakh.dta"
 drop if((Exempted_Revenue==0 | missing(Exempted_Revenue)) & (Exempted_Cost==0 | missing(Exempted_Cost)) & (Exempted_joint_Cost==0 | missing(Exempted_joint_Cost)) & (Exempted_Profit==0 | missing(Exempted_Profit)))
 
 sort actyear id
-order id actyear
+order id actyear trace_id
 
 encode exemption_description, gen(temp)
 drop exemption_description
 rename temp exemption_description
 
+replace exempt_flag = 0 if(missing(exempt_flag))
+drop if(missing(exemption_description))
+//drop bakhshoodegi_description bakhshoodegi_id
+
 sort actyear id
-order id actyear exemption_description exemption_id Exempted_Profit Exempted_Revenue Exempted_Cost Exempted_joint_Cost
+order id actyear trace_id exemption_description exemption_id Exempted_Profit Exempted_Revenue Exempted_Cost Exempted_joint_Cost
+
+replace original_description = "" if(exemption_id!=100 & exemption_id!=118)
 
 save "D:\Data_Output\Hoghooghi\Moafiat.dta", replace

@@ -1,4 +1,12 @@
 
+do "D:\Data_Output\Cleaning_Code\New_Firm_ID.do"
+
+import delimited "D:\CSV_Output\part3\tashkhisi_ghati_corporate.csv", clear
+
+rename id trace_id
+drop actyear
+
+save "D:\Data_Output\Cleaning_Code\Temp\temp_audit.dta", replace
 
 import delimited "D:\CSV_Output\Part2\Compute_Tax.csv", clear 
 
@@ -120,32 +128,17 @@ append using "D:\Data_Output\Cleaning_Code\Temp\temp2.dta"
 append using "D:\Data_Output\Cleaning_Code\Temp\temp1.dta"
 
 
-
-preserve
-keep id
-duplicates drop
-gen new_id = _n
-replace new_id = new_id + 10000000
-save "D:\Data_Output\Cleaning_Code\Temp\temp_id_new.dta", replace
-restore
-
+// #### Use new ID for Firms
 merge n:1 id using "D:\Data_Output\Cleaning_Code\Temp\temp_id_new.dta", nogen
 drop id
 rename new_id id
 
+
+// #### Add Tashkhisi/Ghati data
+merge 1:1 trace_id using "D:\Data_Output\Cleaning_Code\Temp\temp_audit.dta", nogen
+
+
 sort actyear id
-order id actyear
-
-save "D:\Data_Output\Hoghooghi\Mohasebe_Maliat.dta", replace
-
-
-
-// #### Add Tashkhisi/Ghati date
-import delimited "D:\CSV_Output\part3\tashkhisi_ghati_corporate.csv", clear
-
-rename id trace_id
-drop actyear
-
-merge 1:1 trace_id using "D:\Data_Output\Hoghooghi\Mohasebe_Maliat.dta", nogen
+order id actyear trace_id T26_* maliat_tashkhisi maliat_ghatee
 
 save "D:\Data_Output\Hoghooghi\Mohasebe_Maliat.dta", replace

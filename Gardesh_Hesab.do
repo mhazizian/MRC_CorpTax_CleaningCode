@@ -1,5 +1,4 @@
 
-
 import delimited "D:\CSV_Output\Part2\Accumulated_Profit.csv", clear 
 
 *duplicates drop declarationid prflsstype_desc, force
@@ -47,10 +46,7 @@ reshape wide T15_R, i(return_id) j(code) string
 
 merge n:1 return_id using "D:\Data_Output\Cleaning_Code\Temp\temp_id.dta", nogen
 
-drop if(missing(return_id))
 drop return_id
-
-drop if(missing(id))
 
 save "D:\Data_Output\Cleaning_Code\Temp\temp1.dta", replace
 
@@ -64,11 +60,11 @@ replace nat_guid = subinstr(nat_guid,"}", "",.)
 replace nat_guid = subinstr(nat_guid,"{", "",.)
 rename nat_guid id
 
-keep id actyear gsz_*
+keep id actyear gsz_* trace_id
 
 drop gsz_todate gsz_beforeminustaxp gsz_savedtaxp gsz_afterminustaxp gsz_firstyearp gsz_balancep gsz_firstyearbalancedp gsz_transitionfromsavedp gsz_benefitp gsz_legalsavedp gsz_etcsavedp gsz_stockbenefitp gsz_managerrewardp gsz_etcbenefitp gsz_sumbenefitp gsz_benefitendyearp
 
-destring gsz_*, replace ignore("NULL")
+destring gsz_* trace_id, replace ignore("NULL")
 
 rename gsz_beforeminustax T15_000
 rename gsz_savedtax T15_001
@@ -91,7 +87,7 @@ save "D:\Data_Output\Cleaning_Code\Temp\temp2.dta", replace
 
 
 
-import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98_financial.csv", clear 
+import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98.csv", clear 
 
 
 drop if(missing(actyear))
@@ -99,7 +95,7 @@ replace nat_guid = subinstr(nat_guid,"}", "",.)
 replace nat_guid = subinstr(nat_guid,"{", "",.)
 rename nat_guid id
 
-keep id actyear gsz_*
+keep id actyear gsz_* trace_id
 
 drop gsz_todate gsz_beforeminustaxp gsz_savedtaxp gsz_afterminustaxp gsz_firstyearp gsz_balancep gsz_firstyearbalancedp gsz_transitionfromsavedp gsz_benefitp gsz_legalsavedp gsz_etcsavedp gsz_stockbenefitp gsz_managerrewardp gsz_etcbenefitp gsz_sumbenefitp gsz_benefitendyearp
 
@@ -128,7 +124,7 @@ drop id
 rename new_id id
 
 sort actyear id
-order id actyear
+order id actyear trace_id
 
 label var T15_000 "سود یا زیان قبل از کسر مالیات"
 label var T15_001 "ذخیره مالیات ابرازی"
@@ -153,7 +149,6 @@ label var T15_R11 "افزایش سرمایه'"
 label var T15_R12 "افزایش سرمایه در جریان"
 label var T15_R14 "خرید سهام خزانه"
 label var T15_R15 "فروش سهام خزانه"
-
 
 
 save "D:\Data_Output\Hoghooghi\Gardesh_Hesab.dta", replace

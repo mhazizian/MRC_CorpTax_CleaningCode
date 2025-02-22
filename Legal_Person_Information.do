@@ -149,6 +149,6 @@ rename temp T00_EdareName
 
 
 sort actyear id
-order id actyear
+order id actyear trace_id
 
 save "D:\Data_Output\Hoghooghi\Legal_Person_Information.dta", replace

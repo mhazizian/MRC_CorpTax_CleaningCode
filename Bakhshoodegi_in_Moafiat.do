@@ -26,11 +26,15 @@ drop if(missing(id))
 
 merge n:1 bakhshoodegi_id using "D:\Data_Output\Cleaning_Code\Temp\bakhshoodegi_codes.dta", nogen
 
-keep id actyear profitlossexemptincome bakhshoodegi_id bakhshoodegi_description
+drop if(missing(id))
+keep id actyear trace_id profitlossexemptincome bakhshoodegi_id bakhshoodegi_description
        
 rename profitlossexemptincome Rebate_Amount
+replace Rebate_Amount = 0.25 * Rebate_Amount
 
 sort actyear id
-order id actyear bakhshoodegi_id bakhshoodegi_description Rebate_Amount
+order id actyear trace_id bakhshoodegi_id bakhshoodegi_description Rebate_Amount
+
+gen rebate_flag = 1
 
 save "D:\Data_Output\Cleaning_Code\Temp\temp_bakh_in_moaf.dta", replace

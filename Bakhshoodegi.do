@@ -68,19 +68,26 @@ replace nat_guid = subinstr(nat_guid,"}", "",.)
 replace nat_guid = subinstr(nat_guid,"{", "",.)
 rename nat_guid id
 
-duplicates drop id actyear, force ////// Concern
+///duplicates drop id actyear, force ////// Concern
 
-keep id actyear bakhshoodegi* 
+keep id actyear bakhshoodegi* trace_id
 drop bakhshoodegi *sum
 
-destring bakhshoodegi*, replace ignore("NULL")
+foreach i of varlist bakhshoodegi* {
+    capture confirm string variable `i'
+	if(_rc==0){
+	    replace `i' = substr(`i',1,strpos(`i',"/")-1)
+	}
+}
+
+destring bakhshoodegi* trace_id, replace ignore("NULL")
 
 rename bakhshoodegibenefit* Taxable_Profit*
 rename bakhshoodegitax* Taxable_Profit_Tax*
 rename bakhshoodegirate* Rebate_Rate*
 rename bakhshoodegiqty* Rebate_Amount*
 
-reshape long Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount, i(id actyear) j(code)
+reshape long Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount, i(trace_id id actyear) j(code)
 
 drop if((Taxable_Profit==0 | missing(Taxable_Profit)) & (Taxable_Profit_Tax==0 | missing(Taxable_Profit_Tax)) & (Rebate_Amount==0 | missing(Rebate_Amount)))
 
@@ -106,26 +113,33 @@ drop if(missing(bakhshoodegi_description))
 drop code exemption_id
 
 sort actyear id
-order id actyear bakhshoodegi_description bakhshoodegi_id Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount
+order id actyear trace_id bakhshoodegi_description bakhshoodegi_id Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount
 
 save "D:\Data_Output\Cleaning_Code\Temp\temp2.dta", replace
 
 
 
 ******************************
-import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98_financial.csv", clear
+import delimited "D:\CSV_Output\Part1\Hoghooghi_92_98.csv", clear
 
 drop if(missing(actyear))
 replace nat_guid = subinstr(nat_guid,"}", "",.)
 replace nat_guid = subinstr(nat_guid,"{", "",.)
 rename nat_guid id
 
-duplicates drop id actyear, force ////// Concern
+///duplicates drop id actyear, force ////// Concern
 
-keep id actyear bakhshoodegi* 
+keep id actyear bakhshoodegi* trace_id
 drop bakhshoodegi *sum
 
-destring bakhshoodegi*, replace ignore("NULL/")
+foreach i of varlist bakhshoodegi* {
+    capture confirm string variable `i'
+	if(_rc==0){
+	    replace `i' = substr(`i',1,strpos(`i',"/")-1)
+	}
+}
+
+destring bakhshoodegi* trace_id, replace ignore("NULL")
 
 gen bakhshoodegi = 0
 foreach i of varlist bakhshoodegi* {
@@ -140,7 +154,7 @@ rename bakhshoodegitax* Taxable_Profit_Tax*
 rename bakhshoodegirate* Rebate_Rate*
 rename bakhshoodegiqty* Rebate_Amount*
 
-reshape long Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount, i(id actyear) j(code)
+reshape long Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount, i(trace_id id actyear) j(code)
 
 drop if((Taxable_Profit==0 | missing(Taxable_Profit)) & (Taxable_Profit_Tax==0 | missing(Taxable_Profit_Tax)) & (Rebate_Amount==0 | missing(Rebate_Amount)))
 
@@ -172,7 +186,7 @@ drop if(missing(bakhshoodegi_description))
 drop code exemption_id
 
 sort actyear id
-order id actyear bakhshoodegi_description bakhshoodegi_id Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount
+order id actyear trace_id bakhshoodegi_description bakhshoodegi_id Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount
 
 append using "D:\Data_Output\Cleaning_Code\Temp\temp2.dta"
 append using "D:\Data_Output\Cleaning_Code\Temp\temp1.dta"
@@ -186,13 +200,15 @@ rename new_id id
 drop if((Taxable_Profit==0 | missing(Taxable_Profit)) & (Taxable_Profit_Tax==0 | missing(Taxable_Profit_Tax)) & (Rebate_Amount==0 | missing(Rebate_Amount)))
 
 sort actyear id
-order id actyear
+order id actyear trace_id
 
 encode bakhshoodegi_description, gen(temp)
 drop bakhshoodegi_description
 rename temp bakhshoodegi_description
 
 sort actyear id
-order id actyear bakhshoodegi_description bakhshoodegi_id Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount
+order id actyear trace_id bakhshoodegi_description bakhshoodegi_id Taxable_Profit Taxable_Profit_Tax Rebate_Rate Rebate_Amount
+
+replace rebate_flag = 0 if(missing(rebate_flag))
 
 save "D:\Data_Output\Hoghooghi\Bakhshhodegi.dta", replace
