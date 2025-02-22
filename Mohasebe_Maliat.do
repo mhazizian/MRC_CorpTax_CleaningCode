@@ -137,8 +137,19 @@ rename new_id id
 // #### Add Tashkhisi/Ghati data
 merge 1:1 trace_id using "D:\Data_Output\Cleaning_Code\Temp\temp_audit.dta", nogen
 
-
 sort actyear id
 order id actyear trace_id T26_* maliat_tashkhisi maliat_ghatee
 
 save "D:\Data_Output\Hoghooghi\Mohasebe_Maliat.dta", replace
+
+
+// #### Add Maliat Maghtou
+import delimited "D:\CSV_Output\Part1\maliat_maghtu_1400_1401.csv", encoding(UTF-8) clear 
+keep trace_id fixedrateraxableincome 
+rename fixedrateraxableincome maghtou_taxable_income
+
+merge 1:1 trace_id using "D:\Data_Output\Hoghooghi\Mohasebe_Maliat.dta", nogen
+order id actyear trace_id T26_* maghtou_taxable_income maliat_tashkhisi maliat_ghatee
+
+save "D:\Data_Output\Hoghooghi\Mohasebe_Maliat.dta", replace
+
