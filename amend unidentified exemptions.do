@@ -1,7 +1,11 @@
 
 
 // ################## list unidentifed exemptions:
-use "C:\Users\asus\Documents\Majlis RC\data\tax_return\Hoghooghi\Moafiat.dta" , clear
+// global dir "C:\Users\asus\Documents\Majlis RC\data\tax_return\Hoghooghi\Moafiat.dta"
+global dir "D:\Data_Output\Hoghooghi\Moafiat.dta"
+
+use $dir, clear
+
 // keep if exemption_id == 100
 // gen count = 1
 // collapse (sum) count Exempted_Profit actyear, by(original_description)
@@ -238,7 +242,7 @@ label values exemption_description temp
 
 ***************************
 
-save "C:\Users\asus\Documents\Majlis RC\data\tax_return\Hoghooghi\Moafiat.dta" , replace
+save $dir , replace
 
 // to be moved to bakhshoudegi table:
 
