@@ -251,7 +251,7 @@ rsconnect/
 *.dta
 *.gph
 *.smcl
-*.stpr
+# *.stpr
 *.stsem
 
 # Graphic export files from Stata
