@@ -34,7 +34,7 @@ label values exempt_flag moafiat_flag_label
 
 duplicates drop
 duplicates tag id actyear trace_id original_description  if exemption_id == 35, gen(maghtou_dup_tag)
-drop if maghtou_dup_tag == 1 & exempt_flag == 2
+drop if maghtou_dup_tag >= 1 & exempt_flag == 2
 
-
+drop maghtou_dup_tag
 save "$dir\Moafiat.dta", replace  
