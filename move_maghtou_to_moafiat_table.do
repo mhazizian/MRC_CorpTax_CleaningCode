@@ -1,6 +1,8 @@
 clear all
 
 global dir "D:\Data_Output\Hoghooghi"
+// global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
+
 
 use "$dir\Mohasebe_Maliat.dta", replace
 
@@ -29,6 +31,10 @@ append using `temp'
 
 label define moafiat_flag_label 2 "from mohasebe maliat table"
 label values exempt_flag moafiat_flag_label
+
+duplicates drop
+duplicates tag id actyear trace_id original_description  if exemption_id == 35, gen(maghtou_dup_tag)
+drop if maghtou_dup_tag == 1 & exempt_flag == 2
 
 
 save "$dir\Moafiat.dta", replace  
